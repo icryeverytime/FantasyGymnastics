@@ -19,7 +19,7 @@ export class WebSocketService {
 
   // Connect to the websocket
   connect(): Rx.Subject<MessageEvent> {
-    this.socket = io('192.168.1.97:3000');
+    this.socket = io('localhost:3000');
   
     this.socket.onmessage = (event: MessageEvent) => {
       this.socket.next(event);
