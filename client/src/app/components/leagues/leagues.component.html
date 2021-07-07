@@ -1,0 +1,21 @@
+<div class="row mt-5" *ngIf="!this.loading">
+    <div *ngIf="this.isAuthenticated">
+        <div class="col d-flex justify-content-center align-items-center">
+            <div>
+                <h1>{{name}}'s leagues <div class="btn-group" role="group"><button type="button" class="btn btn-secondary" routerLink='/leagues/create'>Create</button> <button type="button" class="btn btn-secondary" routerLink='/leagues/join'>Join</button></div></h1>
+                <div *ngFor="let league of this.leagues">
+                    <span routerLink="/leagues/{{league._id}}">{{league.name}}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div *ngIf="!this.isAuthenticated">
+        <button type="button" class="btn btn-secondary" routerLink='/login'>Login to view leagues</button>
+    </div>
+</div>
+<div class="row" *ngIf="this.loading">
+    <div class="col d-flex justify-content-center mt-5">
+        <div class="spinner-border" role="status">
+        </div>
+    </div>
+</div>

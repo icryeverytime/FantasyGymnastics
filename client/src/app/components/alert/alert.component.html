@@ -1,0 +1,11 @@
+<div id="message" *ngFor="let alert of alerts">
+    <div class="alert alert-light alert-dismissible fade show text-center" style="padding-bottom: 2em;" id="inner-message" role="alert">
+        {{alert.text}}&nbsp;
+        <div class="btn-group" role="group">
+            <button class="btn btn-outline-success" (click)="alert.onAccept()">Accept</button>
+            <button class="btn btn-outline-danger" (click)="alert.onDismiss()">Decline</button>
+        </div>
+        &nbsp;
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+</div>

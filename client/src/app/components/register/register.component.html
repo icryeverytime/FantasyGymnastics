@@ -1,0 +1,24 @@
+<div class="row mt-5">
+    <div class="col d-flex justify-content-center align-items-center">
+        <form>
+            <div class="form-group">
+                <label for="emailInput">Email address</label>
+                <input type="text" class="form-control" name="email" id="emailInput" placeholder="email" #emailInput>
+            </div>
+            <div class="form-group mt-2">
+                <label for="nameInput">Name</label>
+                <input type="text" class="form-control" name="name" id="nameInput" placeholder="name" #nameInput>
+            </div>
+            <div class="form-group mt-2">
+                <label for="passwordInput">Password</label>
+                <input type="password" class="form-control" name="password" id="passwordInput" placeholder="password" #passwordInput>
+            </div>
+            <div class="form-group mt-2">
+                <label for="confirmPasswordInput">Confirm password</label>
+                <input type="password" class="form-control" name="password" id="confirmPasswordInput" placeholder="password" #confirmPasswordInput>
+            </div>
+            <button type="button" class="btn btn-primary mt-2" (click)="register(emailInput.value, nameInput.value, passwordInput.value, confirmPasswordInput.value)">Register</button>            
+            <p class="text-danger">{{formError}}</p>
+        </form>
+    </div>
+</div>

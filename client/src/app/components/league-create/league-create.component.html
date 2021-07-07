@@ -1,0 +1,30 @@
+<div class="row">
+    <div class="col d-flex justify-content-center mt-5">
+        <form>
+            <div class="form-group">
+                <label for="nameInput">League name</label>
+                <input type="text" class="form-control" name="name" placeholder="league name" id='nameInput' #nameInput>
+            </div>
+            <div class="form-group mt-2">
+                <label for="rosterSizeInput">Roster size</label>
+                <input type="number" class="form-control" name="rosterSize" placeholder="roster size" id='rosterSizeInput' #rosterSizeInput>
+            </div>
+            <div class="form-group mt-2">
+                <label for="eventLineupSizeInput">Event lineup size</label>
+                <input type="number" class="form-control" name="eventLineupSize" placeholder="event lineup size" id='eventLineupSizeInput' #eventLineupSizeInput>
+            </div>
+            <div class="form-group mt-2">
+                <label for="eventCountSizeInput">Event count size</label>
+                <input type="number" class="form-control" name="eventCountSize" placeholder="event count size" id='eventCountSizeInput' #eventCountSizeInput>
+            </div>
+            <div class="form-check mt-2">
+                <label class="form-check-label" for="publicCheck">Public</label>
+                <input type="checkbox" class="form-check-input" name="isPublic" id='publicCheck' #publicCheck>
+            </div>
+            <button type="button" class="btn btn-primary mt-2" (click)="createLeague(nameInput.value, rosterSizeInput.value, eventLineupSizeInput.value, eventCountSizeInput.value, publicCheck.checked)">
+                <span class="spinner-border spinner-border-sm" role="status" *ngIf="this.loading" aria-hidden="true"></span>
+                Create
+            </button>
+        </form>
+    </div>
+</div>

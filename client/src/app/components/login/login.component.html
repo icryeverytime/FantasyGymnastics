@@ -1,0 +1,18 @@
+<div class="row mt-5">
+    <div class="col d-flex justify-content-center align-items-center">
+        <form>
+            <div class="form-group">
+                <label for="emailInput">Email address</label>
+                <input type="text" class="form-control" name="email" placeholder="email" id='emailInput' #emailInput>
+            </div>
+            <div class="form-group mt-2">
+                <label for="passwordInput">Password</label>
+                <input type="password" class="form-control" name="password" placeholder="password" id='passwordInput' #passwordInput>
+            </div>
+            <button type="button" class="btn btn-primary mt-2" (click)="login(emailInput.value, passwordInput.value)">
+                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" *ngIf="loginLoading"></span>
+                Login</button>
+            <p class="text-danger">{{formError}}</p>
+        </form>
+    </div>
+</div>
