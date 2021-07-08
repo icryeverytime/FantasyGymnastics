@@ -17,9 +17,11 @@ const LeagueController = express.Router();
  * Handle a request to create a league
  * Expects a request body with the following JSON:
  * {
- *   leagueDocumentID: `some string that is the league document ID`
  *   name: `some string that will be the league's name`
  *   public: `a boolean representing whether the league is publicly available to join`
+ *   rosterSize: `a number representing the number of gymnasts allowed on each team`
+ *   eventLineupSize: `a number representing the number of gymnasts to be put on each event`
+ *   eventCountSize: `a number representing the number of gymnast scores to count on each event`
  * }
  * Returns created league or
  * returns FORM_ERRORS and the errors if there are form errors or

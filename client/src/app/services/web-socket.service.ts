@@ -29,6 +29,7 @@ export class WebSocketService {
       this.socket.complete();
     };
 
+    // Handle an `authenticate-response` message on the socket
     this.socket.on('authenticate-response', (data: any) => {
       if(data['message'] == 'AUTHENTICATED') {
         this.websocketAuthenticatedStore.next(true);
@@ -41,6 +42,7 @@ export class WebSocketService {
       }
     });
 
+    // Handle a `logout-response` message on the socket
     this.socket.on('logout-response', (data: any) => {
       if(data['message'] == 'LOGGED_OUT') {
         this.websocketAuthenticatedStore.next(false);
@@ -50,17 +52,19 @@ export class WebSocketService {
       }
     });
 
+    // Handle a `leagueRequest` message on the socket
     this.socket.on('leagueRequest', (data: any) => {
+      // Send an alert to the user
       this.alertService.pushAlert({
         text: data['user'] + ' has requested to join `' + data['leagueName'] + '`',
         onAccept: () => {
+          // On accept accept the join league request from the other person
           this.leagueService.acceptRequestToJoinLeague(data['leagueID'], data['user']).subscribe(result => {
             console.log(result);
           });
         },
         onDismiss: () => {console.log('denied');}
       });
-      console.log(data);
     });
 
     return this.socket;
@@ -71,11 +75,12 @@ export class WebSocketService {
     this.socket.emit(channel, data);
   }
 
+  // Send authenticate on websocket
   authenticate(token: any) {
-    console.log("emitted authenticate");
     this.socket.emit('authenticate', {token: token});
   }
 
+  // Send logout on websocket
   logout(token: any) {
     this.socket.emit('logout', {token: token});
   }

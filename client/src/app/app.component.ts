@@ -16,16 +16,19 @@ export class AppComponent implements OnInit, OnDestroy {
   private subscription: any;
 
   ngOnInit() {
+    // On single page application load, check if already authenticated and connect to websocket
     this.authService.checkForExistingAuthentication();
     this.websocketService.connect();
     this.subscription = this.authService.isAuthenticated$.subscribe(isAuthenticated => {
       if (isAuthenticated) {
+        // If authenticated, authenticate on websocket
         this.websocketService.authenticate(this.authService.getToken());
       }
     });
   }
 
   ngOnDestroy() {
+    // Unsubscribe from authenticated observable
     this.subscription.unsubscribe();
   }
 }
