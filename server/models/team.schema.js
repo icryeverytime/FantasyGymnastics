@@ -1,5 +1,14 @@
+// team.schema.js, 2021, FG
+// Defines Team schema and related methods
+// ------------------------------------------------------------------------
+
 const Schema = require('mongoose').Schema;
 
+/**
+ * owner: the email of the user who owns the team
+ * name: the name of the team
+ * gymnastIDs: the document IDs of the gymnasts who are on the team
+ */
 const TeamSchema = new Schema({
     owner: {
         type: String,

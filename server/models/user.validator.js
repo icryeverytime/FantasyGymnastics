@@ -1,7 +1,12 @@
-const check = require('express-validator').check;
-const constants = require('../constant');
+// user.validator.js, 2021, FG
+// Defines validators used for user/authentication related requests
+// ------------------------------------------------------------------------
 
-const registerValidation = [
+const check = require('express-validator').check;
+const constants = require('../misc/constants');
+
+// Validator for registration form
+const RegistrationValidator = [
     check('email')
         .exists()
         .withMessage(constants.EMAIL_IS_EMPTY)
@@ -23,7 +28,8 @@ const registerValidation = [
         .withMessage(constants.NAME_TOO_SHORT),
 ];
 
-const loginValidation = [
+// Validator for login form
+const LoginValidator = [
     check('email')
         .exists()
         .withMessage(constants.EMAIL_IS_EMPTY)
@@ -39,6 +45,6 @@ const loginValidation = [
 ];
 
 module.exports = {
-    registerValidation: registerValidation,
-    loginValidation: loginValidation
+    RegistrationValidator: RegistrationValidator,
+    LoginValidator: LoginValidator
 }

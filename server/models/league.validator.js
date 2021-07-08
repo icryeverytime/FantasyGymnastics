@@ -1,7 +1,12 @@
-const check = require('express-validator').check;
-const constants = require('../constant');
+// league.validator.js, 2021, FG
+// Defines validators used for league related requests
+// ------------------------------------------------------------------------
 
-const leagueValidation = [
+const check = require('express-validator').check;
+const constants = require('../misc/constants');
+
+// Validator for league creation form
+const LeagueCreationValidator = [
     check('name')
         .exists()
         .withMessage(constants.NAME_IS_MISSING)
@@ -38,4 +43,4 @@ const leagueValidation = [
         .withMessage(constants.EVENT_LINEUP_COUNT_SIZE_TOO_BIG)
 ];
 
-module.exports = leagueValidation;
+module.exports = LeagueCreationValidator;

@@ -1,10 +1,14 @@
+// express.server.js, 2021, FG
+// Defines the express server, it's passport strategies, rate limiting, and connects to the database
+// ------------------------------------------------------------------------
+
 const express = require('express');
 const passport = require('passport');
 const applyPassportStrategy = require('../passport');
 const rl = require('express-rate-limit');
 const mongoose = require('mongoose');
 
-
+// Initialize the express server
 const app = express();
 
 // Apply strategy to passport

@@ -1,10 +1,19 @@
+// user.model.js, 2021, FG
+// Defines User schema, model, and related methods
+// ------------------------------------------------------------------------
+
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const config = require('../config');
+const config = require('../misc/config');
 
-// Schema defining a user
+/**
+ * email: the user's email address
+ * name: the user's full name
+ * nickname: the user's nickname
+ * password: the user's hashed password
+ */
 const UserSchema = new Schema({
     email: {
         type: String,
@@ -28,19 +37,20 @@ const UserSchema = new Schema({
 // Pre hook to hash password before saving
 UserSchema.pre('save', async function(next) {
     const user = this;
+    // Hash password before saving
     const hash = await bcrypt.hash(user.password, 10);
     user.password = hash;
     next();
 });
 
-// Method to determine whether password is valid
+// Determines whether plaintext password is valid compared to hashed password
 UserSchema.methods.isValidPassword = async function(password) {
     const user = this;
     const compare = await bcrypt.compare(password, user.password);
     return compare;
 }
 
-// Method to generate a JWT for a user
+// Generates a JWT for the user with email, user document ID, and expiration
 UserSchema.methods.generateJWT = function() {
     const user = this;
     const today = new Date();
@@ -56,6 +66,7 @@ UserSchema.methods.generateJWT = function() {
     exp: parseInt(expirationDate.getTime() / 1000, 10)};
 }
 
+// Create User model from schema
 const User = mongoose.model('User', UserSchema);
 
 module.exports = User

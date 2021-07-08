@@ -1,16 +1,21 @@
+// app.js, 2021, FG
+// The main file of the application, it starts the server
+// ------------------------------------------------------------------------
+
 const app = require('./server/express.server');
 const http = require('./server/http.server');
 
-const leagueController = require('./controllers/league.controller');
-const teamController = require('./controllers/team.controller');
-const userController = require('./controllers/user.controller');
+// Import route configurations
+const LeagueController = require('./controllers/league.controller');
+const TeamController = require('./controllers/team.controller');
+const UserController = require('./controllers/user.controller');
 
-// API routes
-app.use('/', userController);
-app.use('/', teamController);
-app.use('/', leagueController);
+// Use route configurations
+app.use('/', UserController);
+app.use('/', TeamController);
+app.use('/', LeagueController);
 
-// Start server
+// Start express and socket.io server
 http.listen(3000, '0.0.0.0', () => {
     console.log("Server listening on port 3000");
 });

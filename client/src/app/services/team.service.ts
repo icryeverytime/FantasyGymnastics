@@ -10,10 +10,4 @@ import { AuthenticationService } from './authentication.service';
 export class TeamService {
 
   constructor(private http: HttpClient, private authService: AuthenticationService) { }
-
-  getTeams() {
-    return this.http.get<Team[]>('/api/teams', { headers: {
-      'Authorization': 'Bearer ' + this.authService.getToken()
-    }});
-  }
 }
