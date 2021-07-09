@@ -2,6 +2,10 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { GymnastService } from 'src/app/services/gymnast.service';
 import { Gymnast } from 'src/app/models/gymnast.model';
 import { Observable } from 'rxjs';
+import { LeagueService } from 'src/app/services/league.service';
+import { ActivatedRoute } from '@angular/router';
+import { League } from 'src/app/models/league.model';
+import { Team } from 'src/app/models/team.model';
 
 @Component({
   selector: 'app-draft',
@@ -10,11 +14,14 @@ import { Observable } from 'rxjs';
 })
 export class DraftComponent implements OnInit, OnDestroy {
 
-  constructor(private gymnastService: GymnastService) { }
+  constructor(private route: ActivatedRoute, private gymnastService: GymnastService, private leagueService: LeagueService) { }
 
   gymnasts: Gymnast[] = [];
+  filteredGymnasts: Gymnast[] = [];
   subscription: any;
   loading: boolean = true;
+  league: any;
+  alreadyDrafted: string[] = [];
 
   sortedByNameAscending: boolean = false;
   sortedByTeamAscending: boolean = false;
@@ -28,9 +35,22 @@ export class DraftComponent implements OnInit, OnDestroy {
   ]);
 
   ngOnInit(): void {
-    this.subscription = this.gymnastService.getAllGymnasts().subscribe(gymnasts => {
-      this.gymnasts = gymnasts;
-      this.loading = false;
+    this.route.params.subscribe(params => {
+      let leagueDocumentID = params['leagueDocumentID'];
+      this.subscription = this.gymnastService.getAllGymnasts().subscribe(gymnasts => {
+        this.leagueService.getLeague(leagueDocumentID).subscribe(league => {
+          this.league = league;
+          this.gymnasts = gymnasts;
+          this.filteredGymnasts = gymnasts;
+          this.league.teams.forEach((team: Team) => {
+            team.gymnastIDs.forEach((gymnastDocumentID: string) => {
+              this.alreadyDrafted.push(gymnastDocumentID);
+            });
+          });
+
+          this.loading = false;
+        });
+      });
     });
   }
 
@@ -40,6 +60,17 @@ export class DraftComponent implements OnInit, OnDestroy {
 
   draft(gymnastDocumentID: string) {
     console.log(gymnastDocumentID);
+  }
+
+  onChangeEvent(event: any) {
+    if(event.target.value == '') {
+      this.filteredGymnasts = this.gymnasts;
+    } else {
+      this.filteredGymnasts = this.gymnasts.filter(gymnast => {
+        return gymnast.name.toLowerCase().startsWith(event.target.value.toLowerCase()) ||
+          gymnast.team.toLowerCase().startsWith(event.target.value.toLowerCase());
+      });
+    }
   }
 
   sortByName() {

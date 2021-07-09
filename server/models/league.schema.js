@@ -4,6 +4,7 @@
 
 const Schema = require('mongoose').Schema;
 const TeamSchema = require('./team.schema');
+const DraftSchema = require('./draft.schema');
 const constants = require('../misc/constants');
 
 /**
@@ -27,6 +28,7 @@ const LeagueSchema = new Schema({
         required: true,
     },
     teams: [TeamSchema],
+    draft: DraftSchema,
     rosterSize: {
         type: Number,
         min: constants.MIN_ROSTER_SIZE,
@@ -62,6 +64,23 @@ LeagueSchema.methods.hasTeamWithOwner = function(owner) {
     }
     return false;
 };
+
+// Start the draft
+LeagueSchema.methods.startDraft = function() {
+    const draftOrder = this.draft.draftOrder;
+    this.teams.forEach(team => {
+        draftOrder.push(team._id);
+    });
+    draftOrder.sort(() => Math.random() - 0.5);
+    this.draft.draftOrder = draftOrder;
+    this.draft.started = true;
+    this.save();
+};
+
+LeagueSchema.methods.endDraft = function() {
+    this.draft.finished = true;
+    this.save();
+}
 
 // Defines a League to be unique by owner and name
 LeagueSchema.index({ owner: 1, name: 1 }, { unique: true });

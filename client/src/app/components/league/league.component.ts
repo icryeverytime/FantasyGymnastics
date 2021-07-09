@@ -2,7 +2,9 @@ import { Location } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { League } from 'src/app/models/league.model';
+import { Team } from 'src/app/models/team.model';
 import { AuthenticationService } from 'src/app/services/authentication.service';
+import { DraftService } from 'src/app/services/draft.service';
 import { LeagueService } from 'src/app/services/league.service';
 import { WebSocketService } from 'src/app/services/web-socket.service';
 
@@ -16,18 +18,11 @@ export class LeagueComponent implements OnInit {
   loading: boolean = true;
   isAuthenticated: boolean = true;
   userEmail: string = '';
-  league: League = {
-    _id: '',
-    name: '',
-    owner: '',
-    teams: [],
-    requested: [],
-    public: false
-  };
+  league: any;
   inLeague: boolean = false;
   requestedToJoin: boolean = false;
 
-  constructor(private router: Router, public location: Location, private leagueService: LeagueService, private route: ActivatedRoute, private authService: AuthenticationService, private websocketService: WebSocketService) {
+  constructor(private router: Router, public location: Location, private leagueService: LeagueService, private route: ActivatedRoute, private authService: AuthenticationService, private websocketService: WebSocketService, private draftService: DraftService) {
   }
 
   ngOnInit(): void {
@@ -39,13 +34,14 @@ export class LeagueComponent implements OnInit {
         this.isAuthenticated = isAuthenticated;
         if(this.isAuthenticated) {
           this.leagueService.getLeague(leagueDocumentID).subscribe(league => {
+            console.log(league);
             this.league = league;
-            this.league.requested.forEach(email => {
+            this.league.requested.forEach((email: string) => {
               if (email === this.userEmail) {
                 this.requestedToJoin = true;
               }
             });
-            this.league.teams.forEach(team => {
+            this.league.teams.forEach((team: Team) => {
               if (team.owner === userEmail) {
                 this.inLeague = true;
               }
@@ -80,6 +76,12 @@ export class LeagueComponent implements OnInit {
       this.leagueService.getLeague(this.league._id).subscribe(league => {
         this.league = league;
       });
+    });
+  }
+
+  startDraft() {
+    this.draftService.startDraft(this.league._id).subscribe(result => {
+      console.log(result);
     });
   }
 

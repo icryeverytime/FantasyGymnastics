@@ -19,24 +19,14 @@ const DraftSchema = new Schema({
         type: Boolean,
         default: false
     },
+    finished: {
+        type: Boolean,
+        default: false
+    },
     currentTurn: {
         type: String,
     },
     draftOrder: [String]
 });
-
-// Randomly sort the draftOrder array
-DraftSchema.methods.randomizeDraftOrder = function() {
-    const draftOrder = this.draftOrder;
-    draftOrder.sort(() => Math.random() - 0.5);
-    this.draftOrder = draftOrder;
-    this.save();
-};
-
-// Start the draft
-DraftSchema.methods.startDraft = function() {
-    this.started = true;
-    this.save();
-};
 
 module.exports = DraftSchema;

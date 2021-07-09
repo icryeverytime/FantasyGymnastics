@@ -5,25 +5,38 @@
         </div>
     </div>
 </div>
-<div *ngIf="!this.loading">
-    <table class="table">
-        <thead>
-            <tr>
-                <th scope="col" class="clickable" (click)="sortByName()">Name</th>
-                <th scope="col" class="clickable" (click)="sortByTeam()">Team</th>
-                <th scope="col" class="clickable" (click)="sortByYear()">Year</th>
-                <th scope="col">Draft</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr *ngFor="let gymnast of gymnasts">
-                <td>{{gymnast.name}}</td>
-                <td>{{gymnast.team}}</td>
-                <td>{{gymnast.year}}</td>
-                <td>
-                    <button type="button" class="btn btn-primary" (click)="draft(gymnast._id)">Draft</button>
-                </td>
-            </tr>
-        </tbody>
-    </table>
+<div class="row" *ngIf="!this.loading">
+    <div class="col-md-6">
+        <div class="card mt-3">
+            <div class="card-body">
+                <h4 class="card-title">Draft members</h4>
+                <p>some person | not here</p>
+                <p>some person | not here</p>
+                <p>some person | not here</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-6">
+        <input type="text" class="form-control mt-3" (keyup)="onChangeEvent($event)" placeholder="search name or team">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col" class="clickable" (click)="sortByName()">Name</th>
+                    <th scope="col" class="clickable" (click)="sortByTeam()">Team</th>
+                    <th scope="col" class="clickable" (click)="sortByYear()">Year</th>
+                    <th scope="col">Draft</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let gymnast of filteredGymnasts">
+                    <td>{{gymnast.name}}</td>
+                    <td>{{gymnast.team}}</td>
+                    <td>{{gymnast.year}}</td>
+                    <td>
+                        <button type="button" class="btn btn-primary" (click)="draft(gymnast._id)">Draft</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 </div>

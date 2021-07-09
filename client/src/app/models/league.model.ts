@@ -1,4 +1,5 @@
 import { Team } from "./team.model";
+import { Draft } from "./draft.model";
 
 export interface League {
     _id: string,
@@ -6,5 +7,6 @@ export interface League {
     owner: string,
     teams: Team[],
     public: boolean,
-    requested: string[]
+    requested: string[],
+    draft: Draft
 }

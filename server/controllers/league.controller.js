@@ -6,6 +6,7 @@ const express = require('express');
 const ev = require('express-validator');
 const League = require('../models/league.model');
 const Team = require('../models/team.model');
+const Draft = require('../models/draft.model');
 const passport = require('passport');
 const constants = require('../misc/constants');
 const LeagueCreationValidator = require('../models/league.validator');
@@ -53,7 +54,11 @@ function createLeagueHandler(req, res) {
             owner: req.user.email,
             name: req.user.email + "'s team"
         });
-        // Create league with the new team
+        // Create draft for the league
+        const draft = new Draft({
+            pickTimeLimit: 100000,
+        });
+        // Create league
         const league = new League({
             owner: req.user.email,
             name: req.body.name,
@@ -63,7 +68,8 @@ function createLeagueHandler(req, res) {
             eventCountSize: req.body.eventCountSize,
             invited: [],
             requested: [],
-            public: req.body.public
+            public: req.body.public,
+            draft: draft
         });
         // Save the league
         league.save();
