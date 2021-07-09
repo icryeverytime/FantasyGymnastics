@@ -9,11 +9,13 @@ const http = require('./server/http.server');
 const LeagueController = require('./controllers/league.controller');
 const TeamController = require('./controllers/team.controller');
 const UserController = require('./controllers/user.controller');
+const GymnastController = require('./controllers/gymnast.controller');
 
 // Use route configurations
 app.use('/', UserController);
 app.use('/', TeamController);
 app.use('/', LeagueController);
+app.use('/', GymnastController);
 
 // Start express and socket.io server
 http.listen(3000, '0.0.0.0', () => {

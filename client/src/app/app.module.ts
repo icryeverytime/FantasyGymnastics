@@ -12,6 +12,7 @@ import { LeagueComponent } from './components/league/league.component';
 import { LeagueCreateComponent } from './components/league-create/league-create.component';
 import { LeagueJoinComponent } from './components/league-join/league-join.component';
 import { AlertComponent } from './components/alert/alert.component';
+import { DraftComponent } from './components/draft/draft.component';
 
 @NgModule({
   declarations: [
@@ -24,7 +25,8 @@ import { AlertComponent } from './components/alert/alert.component';
     LeagueComponent,
     LeagueCreateComponent,
     LeagueJoinComponent,
-    AlertComponent
+    AlertComponent,
+    DraftComponent
   ],
   imports: [
     BrowserModule,

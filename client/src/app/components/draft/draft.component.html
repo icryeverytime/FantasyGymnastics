@@ -1,0 +1,29 @@
+<button type="button" class="btn btn-secondary" routerLink='..'>Back</button>
+<div class="row" *ngIf="this.loading">
+    <div class="col d-flex justify-content-center mt-5">
+        <div class="spinner-border" role="status">
+        </div>
+    </div>
+</div>
+<div *ngIf="!this.loading">
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col" class="clickable" (click)="sortByName()">Name</th>
+                <th scope="col" class="clickable" (click)="sortByTeam()">Team</th>
+                <th scope="col" class="clickable" (click)="sortByYear()">Year</th>
+                <th scope="col">Draft</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let gymnast of gymnasts">
+                <td>{{gymnast.name}}</td>
+                <td>{{gymnast.team}}</td>
+                <td>{{gymnast.year}}</td>
+                <td>
+                    <button type="button" class="btn btn-primary" (click)="draft(gymnast._id)">Draft</button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>

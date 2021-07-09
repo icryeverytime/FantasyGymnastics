@@ -7,6 +7,7 @@ import { LeaguesComponent } from './components/leagues/leagues.component';
 import { LeagueComponent } from './components/league/league.component';
 import { LeagueCreateComponent } from './components/league-create/league-create.component';
 import { LeagueJoinComponent } from './components/league-join/league-join.component';
+import { DraftComponent } from './components/draft/draft.component';
 
 const routes: Routes = [
   { path: 'login', component: LoginComponent},
@@ -15,6 +16,7 @@ const routes: Routes = [
   { path: 'leagues/create', component: LeagueCreateComponent},
   { path: 'leagues/join', component: LeagueJoinComponent},
   { path: 'leagues/:leagueDocumentID', component: LeagueComponent},
+  { path: 'leagues/:leagueDocumentID/draft', component: DraftComponent},
   { path: '', component: HomeComponent}
 ];
 
