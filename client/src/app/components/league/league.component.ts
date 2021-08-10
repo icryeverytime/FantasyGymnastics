@@ -82,6 +82,9 @@ export class LeagueComponent implements OnInit {
   startDraft() {
     this.draftService.startDraft(this.league._id).subscribe(result => {
       console.log(result);
+      if(result) {
+        this.league.draft.started = true;
+      }
     });
   }
 

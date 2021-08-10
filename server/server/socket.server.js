@@ -6,6 +6,7 @@ const constants = require('../misc/constants');
 const jwt = require('jsonwebtoken');
 const config = require('../misc/config');
 const http = require('./http.server');
+const League = require('../models/league.model');
 
 // Define socket.io server
 const io = require('socket.io')(http, {
@@ -17,7 +18,7 @@ const io = require('socket.io')(http, {
 // Map of user email => socket IDs (one socket ID for each open browser window)
 var socketConnections = new Map();
 
-// Send a message on a certain channel to a specific usre
+// Send a message on a certain channel to a user
 function sendMessageToUser(email, channel, message) {
     // Get the socket IDs of the user
     userConnections = socketConnections.get(email);
@@ -59,6 +60,7 @@ function onSocketAuthenticate(socket, data) {
                 }
                 userConnections.push(socket.id);
                 socketConnections.set(decoded.email, userConnections);
+                console.log("[socket.server.js], user authenticated, ", socketConnections);
 
                 // If the user was authenticated on the socket, return AUTHENTICATED message on the 'authenticate-response' channel
                 socket.emit('authenticate-response', {
@@ -114,7 +116,7 @@ function onSocketDisconnect(socket) {
         userConnections = socketConnections.get(socket.email);
         userConnections.splice(userConnections.indexOf(socket.id), 1);
         socketConnections.set(socket.email, userConnections);
-        console.log(socketConnections);
+        console.log("[socket.server.js], user left, ", socketConnections);
     }
 }
 
@@ -133,11 +135,15 @@ io.on('connection', (socket) => {
 
     socket.on('logout', (data) => {
         onSocketLogout(socket, data);
-    });                 
+    });
 
     socket.on('disconnect', () => {
         onSocketDisconnect(socket);
     });
 });
 
-module.exports = sendMessageToUser;
+module.exports = {
+    sendMessageToUser: sendMessageToUser,
+    io: io,
+    socketConnections: socketConnections
+};

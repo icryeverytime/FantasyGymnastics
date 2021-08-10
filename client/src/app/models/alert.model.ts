@@ -1,5 +1,7 @@
 export interface Alert {
     text: string;
+    showAccept: boolean;
+    showDecline: boolean;
     onAccept: () => void;
-    onDismiss: () => void;
+    onDecline: () => void;
 }

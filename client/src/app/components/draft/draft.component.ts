@@ -6,6 +6,7 @@ import { LeagueService } from 'src/app/services/league.service';
 import { ActivatedRoute } from '@angular/router';
 import { League } from 'src/app/models/league.model';
 import { Team } from 'src/app/models/team.model';
+import { DraftService } from 'src/app/services/draft.service';
 
 @Component({
   selector: 'app-draft',
@@ -14,7 +15,7 @@ import { Team } from 'src/app/models/team.model';
 })
 export class DraftComponent implements OnInit, OnDestroy {
 
-  constructor(private route: ActivatedRoute, private gymnastService: GymnastService, private leagueService: LeagueService) { }
+  constructor(private route: ActivatedRoute, private gymnastService: GymnastService, private leagueService: LeagueService, private draftService: DraftService) { }
 
   gymnasts: Gymnast[] = [];
   filteredGymnasts: Gymnast[] = [];
@@ -37,6 +38,9 @@ export class DraftComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.route.params.subscribe(params => {
       let leagueDocumentID = params['leagueDocumentID'];
+      this.draftService.joinDraftRoom(leagueDocumentID).subscribe(result => {
+        console.log(result);
+      });
       this.subscription = this.gymnastService.getAllGymnasts().subscribe(gymnasts => {
         this.leagueService.getLeague(leagueDocumentID).subscribe(league => {
           this.league = league;

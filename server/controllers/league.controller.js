@@ -319,6 +319,56 @@ function acceptRequestToJoinLeagueHandler(req, res) {
 LeagueController.post('/acceptRequestToJoin', passport.authenticate('jwt', {session: false}), acceptRequestToJoinLeagueHandler);
 
 /**
+ * Handle a request to decline a request to join a league
+ * Expects a request body with the following JSON:
+ * {
+ *   leagueDocumentID: `some string that is the league document ID`
+ *   email: `some string that is the email of the user to reject from the league`
+ * }
+ * Sends a message to the requested user they've been rejected and returns REQUEST_SUCESSFULLY_REJECTED or
+ * returns NO_LEAGUE_FOUND if the league does not exist or
+ * returns PERMISSION_DENIED if the user is not the league owner or
+ * returns REQUEST_NOT_FOUND if the requested user has not requested to join the league
+ */
+function rejectRequestToJoinLeagueHandler(req, res) {
+    League.findById(req.body.leagueDocumentID).then(league => {
+        // If the league does not exist, return NO_LEAGUE_FOUND message
+        if (!league) {
+            return res.status(200).json({
+                message: constants.NO_LEAGUE_FOUND
+            });
+        }
+        // If the user is not the league owner, return PERMISSION_DENIED message
+        if (!league.owner == req.user.email) {
+            return res.status(200).json({
+                message: constants.PERMISSION_DENIED
+            });
+        }
+
+        if(!league.requested.includes(req.body.email)) {
+            return res.status(200).json({
+                message: constants.REQUEST_NOT_FOUND
+            });
+        }
+
+        // Remove the requested user from the requested list
+        league.requested.splice(league.requested.indexOf(req.body.email), 1);
+        league.save();
+        sendMessageToUser(req.body.email, 'leagueRejected', {leagueName: league.name, leagueID: league._id});
+        return res.status(200).json({
+            message: constants.REQUEST_SUCESSFULLY_REJECTED
+        });
+    }).catch(err => {
+        console.error(err);
+        return res.status(200).json({
+            message: constants.SOMETHING_WENT_WRONG
+        });
+    });
+}
+// Define '/rejectRequestToJoin' route and use authentication with handler above
+LeagueController.post('/rejectRequestToJoin', passport.authenticate('jwt', {session: false}), rejectRequestToJoinLeagueHandler);
+
+/**
  * Handle a request to accept an invitation to join a league
  * Expects a request body with the following JSON:
  * {

@@ -90,6 +90,21 @@ export class LeagueService {
     }});
   }
 
+  /**
+   * Send request to reject request to join league
+   * leagueDocumentID: `some string that is the league document ID`
+   * email: `some string that is the email of the user to reject from the league`
+   */
+  declineRequestToJoinLeague(leagueDocumentID: string, email: string) {
+    return this.http.post('/api/rejectRequestToJoin', {
+      leagueDocumentID: leagueDocumentID,
+      email: email
+    },
+    {headers: {
+      'Authorization': 'Bearer ' + this.authService.getToken()
+    }});
+  }
+
   /** Send request to delete league
    * leagueDocumentID: `some string that is the league document ID`
    */

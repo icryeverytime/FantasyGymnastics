@@ -3,6 +3,8 @@ import { io } from 'socket.io-client';
 import * as Rx from 'rxjs';
 import { AlertService } from './alert.service';
 import { LeagueService } from './league.service';
+import { DraftEvent } from '../models/draft-event.model';
+import { DraftService } from './draft.service';
 
 @Injectable({
   providedIn: 'root'
@@ -13,7 +15,7 @@ export class WebSocketService {
   websocketAuthenticatedStore = new Rx.ReplaySubject<boolean>(1);
   public websocketAuthenticated$ = this.websocketAuthenticatedStore.asObservable();
 
-  constructor(private alertService: AlertService, private leagueService: LeagueService) {
+  constructor(private draftService: DraftService, private alertService: AlertService, private leagueService: LeagueService) {
     this.websocketAuthenticatedStore.next(false);
   }
 
@@ -57,14 +59,60 @@ export class WebSocketService {
       // Send an alert to the user
       this.alertService.pushAlert({
         text: data['user'] + ' has requested to join `' + data['leagueName'] + '`',
+        showAccept: true,
+        showDecline: true,
         onAccept: () => {
           // On accept accept the join league request from the other person
           this.leagueService.acceptRequestToJoinLeague(data['leagueID'], data['user']).subscribe(result => {
             console.log(result);
           });
         },
-        onDismiss: () => {console.log('denied');}
+        onDecline: () => {
+          this.leagueService.declineRequestToJoinLeague(data['leagueID'], data['user']).subscribe(result => {
+            console.log(result);
+          });
+        }
       });
+    });
+
+    // Handle a `leagueRejected` message on the socket
+    this.socket.on('leagueRejected', (data: any) => {
+      // Send an alert to the user
+      this.alertService.pushAlert({
+        text: 'Your request to join `' + data['leagueName'] + '` has been declined',
+        showAccept: false,
+        showDecline: false,
+        onAccept: () => {},
+        onDecline: () => {}
+      });
+    });
+
+    // Handle a `leagueAccepted` message on the socket
+    this.socket.on('leagueAccepted', (data: any) => {
+      // Send an alert to the user
+      this.alertService.pushAlert({
+        text: 'Your request to join `' + data['leagueName'] + '` has been accepted',
+        showAccept: false,
+        showDecline: false,
+        onAccept: () => {},
+        onDecline: () => {}
+      });
+    });
+
+    // Handle a `draftStarted` message on the socket
+    this.socket.on('draftStarted', (data: any) => {
+      // Send an alert to the user
+      this.alertService.pushAlert({
+        text: 'The draft has started for `' + data['leagueName'] + '`',
+        showAccept: false,
+        showDecline: false,
+        onAccept: () => {},
+        onDecline: () => {}
+      });
+    });
+
+    this.socket.on('draftEvent', (event: DraftEvent) => {
+      this.draftService.handleDraftEvent(event);
     });
 
     return this.socket;
@@ -84,5 +132,4 @@ export class WebSocketService {
   logout(token: any) {
     this.socket.emit('logout', {token: token});
   }
-
 }

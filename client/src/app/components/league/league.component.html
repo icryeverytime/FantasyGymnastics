@@ -8,7 +8,7 @@
     <h1 *ngIf="!this.loading"><button (click)="this.location.back()" class="btn btn-secondary">Back</button> {{this.league.name}} <button class="btn btn-secondary" (click)="requestToJoin()" *ngIf="this.league.public && !inLeague && !requestedToJoin">Request to join</button></h1>
     <button class="btn btn-danger" *ngIf="this.league.owner == this.userEmail" (click)="deleteLeague()">Delete</button>
     <button class="btn btn-primary" *ngIf="this.league.owner == this.userEmail && !this.league.draft.started" (click)='startDraft()'>Start draft</button>
-    <button class="btn btn-primary" *ngIf="this.league.owner == this.userEmail && this.league.draft.started" routerLink='draft'>View draft</button>
+    <button class="btn btn-primary" *ngIf="this.league.draft.started" routerLink='draft'>View draft</button>
     <div *ngIf="this.league.owner == this.userEmail && this.league.requested.length > 0">
         <h3>Requested to join</h3>
         <div *ngFor="let email of this.league.requested">

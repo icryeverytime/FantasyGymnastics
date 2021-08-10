@@ -6,6 +6,7 @@ const Schema = require('mongoose').Schema;
 const TeamSchema = require('./team.schema');
 const DraftSchema = require('./draft.schema');
 const constants = require('../misc/constants');
+const sendMessageToUser = require('../server/socket.server');
 
 /**
  * owner: the email of the owner of the league
@@ -65,7 +66,7 @@ LeagueSchema.methods.hasTeamWithOwner = function(owner) {
     return false;
 };
 
-// Start the draft
+// Start the draft, create the draft order, and send a message to all users in the league
 LeagueSchema.methods.startDraft = function() {
     const draftOrder = this.draft.draftOrder;
     this.teams.forEach(team => {
@@ -74,6 +75,13 @@ LeagueSchema.methods.startDraft = function() {
     draftOrder.sort(() => Math.random() - 0.5);
     this.draft.draftOrder = draftOrder;
     this.draft.started = true;
+
+    // Send a message to everyone in the league that the draft has started
+    this.teams.forEach(team => {
+        sendMessageToUser(team.owner, 'draftStarted', {
+            leagueName: this.name,
+        });
+    });
     this.save();
 };
 
