@@ -34,7 +34,6 @@ export class LeagueComponent implements OnInit {
         this.isAuthenticated = isAuthenticated;
         if(this.isAuthenticated) {
           this.leagueService.getLeague(leagueDocumentID).subscribe(league => {
-            console.log(league);
             this.league = league;
             this.league.requested.forEach((email: string) => {
               if (email === this.userEmail) {

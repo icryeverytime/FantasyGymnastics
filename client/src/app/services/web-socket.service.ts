@@ -15,44 +15,22 @@ export class WebSocketService {
   websocketAuthenticatedStore = new Rx.ReplaySubject<boolean>(1);
   public websocketAuthenticated$ = this.websocketAuthenticatedStore.asObservable();
 
+  socketIDStore = new Rx.ReplaySubject<string>(1);
+  public socketID$ = this.socketIDStore.asObservable();
+
   constructor(private draftService: DraftService, private alertService: AlertService, private leagueService: LeagueService) {
     this.websocketAuthenticatedStore.next(false);
   }
 
   // Connect to the websocket
   connect(): Rx.Subject<MessageEvent> {
-    this.socket = io('localhost:3000');
+    this.socket = io('localhost:3000/draft/6111af025719c875be93d922', {
+      query: {'token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNocmlzQGdtYWlsLmNvbSIsInVzZXJJZCI6IjYwZGU2ZjNkN2NhMWI3NzYxYWE4ODk3ZSIsImV4cCI6MTYyODcyNjYwMSwiaWF0IjoxNjI4NjQwMjAxfQ.aRHPCyo7Geg6v4hSAQVCQzfI3p_OGcIH16W0fQn9K08'}
+    });
   
     this.socket.onmessage = (event: MessageEvent) => {
       this.socket.next(event);
     };
-
-    this.socket.onclose = () => {
-      this.socket.complete();
-    };
-
-    // Handle an `authenticate-response` message on the socket
-    this.socket.on('authenticate-response', (data: any) => {
-      if(data['message'] == 'AUTHENTICATED') {
-        this.websocketAuthenticatedStore.next(true);
-      } else if(data['message'] == 'NO_TOKEN_PROVIDED') {
-        this.websocketAuthenticatedStore.next(false);
-      } else if(data['message'] == 'INVALID_TOKEN') {
-        this.websocketAuthenticatedStore.next(false);
-      } else {
-        this.websocketAuthenticatedStore.next(false);
-      }
-    });
-
-    // Handle a `logout-response` message on the socket
-    this.socket.on('logout-response', (data: any) => {
-      if(data['message'] == 'LOGGED_OUT') {
-        this.websocketAuthenticatedStore.next(false);
-      } else if(data['message'] == 'NO_TOKEN_PROVIDED') {
-      } else if(data['message'] == 'INVALID_TOKEN') {
-      } else {
-      }
-    });
 
     // Handle a `leagueRequest` message on the socket
     this.socket.on('leagueRequest', (data: any) => {
@@ -111,25 +89,11 @@ export class WebSocketService {
       });
     });
 
-    this.socket.on('draftEvent', (event: DraftEvent) => {
-      this.draftService.handleDraftEvent(event);
-    });
-
     return this.socket;
   }
 
   // Send data to a channel
   send(channel: string, data: any) {
     this.socket.emit(channel, data);
-  }
-
-  // Send authenticate on websocket
-  authenticate(token: any) {
-    this.socket.emit('authenticate', {token: token});
-  }
-
-  // Send logout on websocket
-  logout(token: any) {
-    this.socket.emit('logout', {token: token});
   }
 }

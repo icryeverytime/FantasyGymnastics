@@ -5,8 +5,13 @@ import { Observable } from 'rxjs';
 import { LeagueService } from 'src/app/services/league.service';
 import { ActivatedRoute } from '@angular/router';
 import { League } from 'src/app/models/league.model';
+import { io } from 'socket.io-client';
+import * as Rx from 'rxjs';
 import { Team } from 'src/app/models/team.model';
 import { DraftService } from 'src/app/services/draft.service';
+import { WebSocketService } from 'src/app/services/web-socket.service';
+import { AuthenticationService } from 'src/app/services/authentication.service';
+import { DraftEvent, DraftEventType, GymnastDraftedEvent } from 'src/app/models/draft-event.model';
 
 @Component({
   selector: 'app-draft',
@@ -15,14 +20,18 @@ import { DraftService } from 'src/app/services/draft.service';
 })
 export class DraftComponent implements OnInit, OnDestroy {
 
-  constructor(private route: ActivatedRoute, private gymnastService: GymnastService, private leagueService: LeagueService, private draftService: DraftService) { }
+  constructor(private authenticationService: AuthenticationService, private websocketService: WebSocketService, private route: ActivatedRoute, private gymnastService: GymnastService, private leagueService: LeagueService, private draftService: DraftService) { }
 
   gymnasts: Gymnast[] = [];
   filteredGymnasts: Gymnast[] = [];
   subscription: any;
   loading: boolean = true;
   league: any;
-  alreadyDrafted: string[] = [];
+  leagueDocumentID: string = '';
+  sid: string = '';
+  socket: any;
+  draftComplete: boolean = false;
+  notMyTurn: boolean = false;
 
   sortedByNameAscending: boolean = false;
   sortedByTeamAscending: boolean = false;
@@ -37,33 +46,59 @@ export class DraftComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.route.params.subscribe(params => {
-      let leagueDocumentID = params['leagueDocumentID'];
-      this.draftService.joinDraftRoom(leagueDocumentID).subscribe(result => {
-        console.log(result);
-      });
-      this.subscription = this.gymnastService.getAllGymnasts().subscribe(gymnasts => {
-        this.leagueService.getLeague(leagueDocumentID).subscribe(league => {
-          this.league = league;
-          this.gymnasts = gymnasts;
-          this.filteredGymnasts = gymnasts;
-          this.league.teams.forEach((team: Team) => {
-            team.gymnastIDs.forEach((gymnastDocumentID: string) => {
-              this.alreadyDrafted.push(gymnastDocumentID);
-            });
-          });
+      this.leagueDocumentID = params['leagueDocumentID'];
+      this.connectToWebsocket();
+        this.subscription = this.gymnastService.getAllGymnasts().subscribe(gymnasts => {
+          this.leagueService.getLeague(this.leagueDocumentID).subscribe(league => {
+            this.league = league;
+            
+            this.gymnasts = gymnasts;
+            this.filteredGymnasts = gymnasts;
 
-          this.loading = false;
-        });
+            this.loading = false;
+          });
       });
     });
   }
 
   ngOnDestroy(): void {
     this.subscription.unsubscribe();
+    this.socket.disconnect();
+  }
+
+  connectToWebsocket() {
+    let token = this.authenticationService.getToken();
+    this.socket = io('localhost:3000/draft/' + this.leagueDocumentID, {
+      query: {
+        token: token
+      }
+    });
+
+    this.socket.onmessage = (event: MessageEvent) => {
+      this.socket.next(event);
+    };
+
+    this.socket.on('draftEvent', (event: DraftEvent) => {
+      if (event.type == DraftEventType.GYMNAST_DRAFTED) {
+        let gymnastDraftEvent = event as GymnastDraftedEvent;
+        this.filteredGymnasts = this.filteredGymnasts.filter((gymnast: Gymnast) => {
+          return gymnast._id != gymnastDraftEvent.data.gymnastID;
+        });
+        this.gymnasts = this.gymnasts.filter((gymnast: Gymnast) => {
+          return gymnast._id != gymnastDraftEvent.data.gymnastID;
+        });
+      } else if(event.type == DraftEventType.DRAFT_COMPLETE) {
+        alert('Draft complete');
+      }
+    });
+
+    return this.socket;
   }
 
   draft(gymnastDocumentID: string) {
-    console.log(gymnastDocumentID);
+    this.draftService.draftGymnast(this.leagueDocumentID, gymnastDocumentID).subscribe((result) => {
+      console.log(result);
+    });
   }
 
   onChangeEvent(event: any) {

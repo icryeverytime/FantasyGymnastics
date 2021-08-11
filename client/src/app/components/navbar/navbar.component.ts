@@ -28,7 +28,6 @@ export class NavbarComponent implements OnInit {
   }
 
   logout(): void {
-    this.websocketService.logout(this.authService.getToken());
     this.authService.logout();
   }
 

@@ -4,6 +4,7 @@
 
 const app = require('./server/express.server');
 const http = require('./server/http.server');
+require('./controllers/draft.socket.controller');
 
 // Import route configurations
 const LeagueController = require('./controllers/league.controller');

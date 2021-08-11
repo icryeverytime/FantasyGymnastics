@@ -20,7 +20,11 @@ const TeamSchema = new Schema({
         required: true,
         unique: false
     },
-    gymnastIDs: [Number]
+    gymnastIDs: [String]
 });
+
+TeamSchema.methods.isTeamFull = function() {
+    return this.gymnastIDs.length >= this.parent().rosterSize;
+}
 
 module.exports = TeamSchema;

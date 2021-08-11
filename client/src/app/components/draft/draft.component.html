@@ -10,9 +10,6 @@
         <div class="card mt-3">
             <div class="card-body">
                 <h4 class="card-title">Draft members</h4>
-                <p>some person | not here</p>
-                <p>some person | not here</p>
-                <p>some person | not here</p>
             </div>
         </div>
     </div>
@@ -33,7 +30,7 @@
                     <td>{{gymnast.team}}</td>
                     <td>{{gymnast.year}}</td>
                     <td>
-                        <button type="button" class="btn btn-primary" (click)="draft(gymnast._id)">Draft</button>
+                        <button type="button" class="btn btn-primary" (click)="draft(gymnast._id)" [disabled]="this.draftComplete || this.notMyTurn">Draft</button>
                     </td>
                 </tr>
             </tbody>

@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { DraftEvent, DraftEventType, UserJoinedDraftEvent } from '../models/draft-event.model';
+import { DraftEvent, DraftEventType, UserJoinedDraftEvent, UserLeftDraftEvent, GymnastDraftedEvent } from '../models/draft-event.model';
 import { AuthenticationService } from './authentication.service';
 import { WebSocketService } from './web-socket.service';
 
@@ -18,8 +18,8 @@ export class DraftService {
     }})
   }
 
-  joinDraftRoom(leagueDocumentID: string) {
-    return this.http.post('/api/joinDraftRoom', {leagueDocumentID: leagueDocumentID},
+  draftGymnast(leagueDocumentID: string, gymnastDocumentID: string) {
+    return this.http.post('/api/draftGymnast', {leagueDocumentID: leagueDocumentID, gymnastDocumentID: gymnastDocumentID},
     {headers: {
       'Authorization': 'Bearer ' + this.authService.getToken()
     }})
@@ -29,6 +29,9 @@ export class DraftService {
     if (draftEvent.type == DraftEventType.USER_JOINED) {
       let userDraftEvent = draftEvent as UserJoinedDraftEvent;
       console.log("Draft event", userDraftEvent.data.userEmail + " has joined");
+    } else if(draftEvent.type == DraftEventType.USER_LEFT) {
+      let userDraftEvent = draftEvent as UserLeftDraftEvent;
+      console.log("Draft event", userDraftEvent.data.userEmail + " has left");
     }
   }
 }

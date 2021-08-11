@@ -5,9 +5,9 @@
 const express = require('express');
 const passport = require('passport');
 const constants = require('../misc/constants');
-const Gymnast = require('../models/gymnast.model');
 const League = require('../models/league.model');
-const {io, socketConnections} = require('../server/socket.server.js');
+const Gymnast = require('../models/gymnast.model');
+const draftWorkspaces = require('./draft.socket.controller');
 
 const DraftController = express.Router();
 
@@ -18,7 +18,7 @@ const DraftController = express.Router();
  *   leagueDocumentID: `some string that is the league's document ID`
  * }
  * Starts draft or
- * returns LEAGUE_NOT_FOUND if league with id not found
+ * returns NO_LEAGUE_FOUND if league with id not found
  * returns PERMISSION_DENIED if user is not league owner or
  * returns DRAFT_ALREADY_STARTED if draft has already started
  */
@@ -55,11 +55,17 @@ function startDraftHandler(req, res) {
 // Define '/startDraft' route and use authentication with handler above
 DraftController.post('/startDraft/', passport.authenticate('jwt', {session: false}), startDraftHandler);
 
-function joinDraftRoomHandler(req, res) {
+function draftGymnastHandler(req, res) {
     League.findOne({ _id: req.body.leagueDocumentID }).then(league => {
         if(!league) {
             return res.status(200).json({
                 message: constants.NO_LEAGUE_FOUND
+            });
+        }
+
+        if(!league.hasTeamWithOwner(req.user.email)) {
+            return res.status(200).json({
+                message: constants.PERMISSION_DENIED
             });
         }
 
@@ -69,27 +75,48 @@ function joinDraftRoomHandler(req, res) {
             });
         }
 
-        let userSocketIDs = socketConnections.get(req.user.email);
-        if(!userSocketIDs) {
+        if(league.draft.finished) {
             return res.status(200).json({
-                message: constants.PERMISSION_DENIED
+                message: constants.DRAFT_FINISHED
             });
         }
 
-        userSocketIDs.forEach(socketID => {
-            io.sockets.sockets.get(socketID).join(req.body.leagueDocumentID);
+        if (!league.draft.isCurrentTurn(req.user.email)) {
+            return res.status(200).json({
+                message: constants.NOT_YOUR_TURN
+            });
+        }
+
+        if (league.draft.isGymnastDrafted(req.body.gymnastDocumentID)) {
+            return res.status(200).json({
+                message: constants.GYMNAST_ALREADY_DRAFTED
+            });
+        }
+
+        if (league.getTeamByOwner(req.user.email).isTeamFull()) {
+            return res.status(200).json({
+                message: constants.TEAM_FULL
+            });
+        }
+
+        let draftComplete = league.draftGymnast(league.getTeamByOwner(req.user.email), req.body.gymnastDocumentID);
+        Gymnast.findOne({ _id: req.body.gymnastDocumentID }).then(gymnast => {
+            draftWorkspaces.emit('draftEvent', {
+                type: 2, // GYMNAST_DRAFTED event
+                data: {
+                    gymnastID: req.body.gymnastDocumentID,
+                    name: gymnast.name
+                }
+            });
         });
 
-        io.to(req.body.leagueDocumentID).emit('draftEvent', {
-            type: 0,
-            data: {
-                userEmail: req.user.email,
-            }
-        });
-        return res.status(200).json({
-            message: constants.DRAFT_WS_ROOM_JOINED
-        });
+        if (draftComplete) {
+            draftWorkspaces.emit('draftEvent', {
+                type: 3, // DRAFT_COMPLETE event
+            });
+        }
 
+        return res.status(200).json(league.getTeamByOwner(req.user.email));
     }).catch(err => {
         console.error(err);
         return res.status(200).json({
@@ -97,6 +124,6 @@ function joinDraftRoomHandler(req, res) {
         });
     });
 }
-DraftController.post('/joinDraftRoom', passport.authenticate('jwt' , {session: false}), joinDraftRoomHandler);
+DraftController.post('/draftGymnast/', passport.authenticate('jwt', {session: false}), draftGymnastHandler);
 
 module.exports = DraftController;

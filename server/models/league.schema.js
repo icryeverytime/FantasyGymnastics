@@ -6,7 +6,6 @@ const Schema = require('mongoose').Schema;
 const TeamSchema = require('./team.schema');
 const DraftSchema = require('./draft.schema');
 const constants = require('../misc/constants');
-const sendMessageToUser = require('../server/socket.server');
 
 /**
  * owner: the email of the owner of the league
@@ -74,21 +73,30 @@ LeagueSchema.methods.startDraft = function() {
     });
     draftOrder.sort(() => Math.random() - 0.5);
     this.draft.draftOrder = draftOrder;
+    this.draft.currentTurn = draftOrder[0];
     this.draft.started = true;
 
-    // Send a message to everyone in the league that the draft has started
-    this.teams.forEach(team => {
-        sendMessageToUser(team.owner, 'draftStarted', {
-            leagueName: this.name,
-        });
-    });
     this.save();
 };
 
-LeagueSchema.methods.endDraft = function() {
-    this.draft.finished = true;
+LeagueSchema.methods.draftGymnast = function(team, gymnastID) {
+    console.log('Drafting', gymnastID, 'to', team._id);
+    team.gymnastIDs.push(gymnastID);
+    this.draft.draftedGymnasts.push(gymnastID);
+    this.draft.currentTurn = this.draft.draftOrder[(this.draft.draftOrder.indexOf(team._id) + 1) % this.draft.draftOrder.length];
+    
+    if (this.draft.draftedGymnasts.length == this.rosterSize * this.teams.length) {
+        this.draft.finished = true;
+    }
+
     this.save();
+    
+    return this.draft.finished;
 }
+
+LeagueSchema.methods.getTeamByOwner = function(owner) {
+    return this.teams.filter(team => team.owner === owner)[0];
+};
 
 // Defines a League to be unique by owner and name
 LeagueSchema.index({ owner: 1, name: 1 }, { unique: true });

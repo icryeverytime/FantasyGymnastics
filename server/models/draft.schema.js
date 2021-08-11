@@ -26,7 +26,16 @@ const DraftSchema = new Schema({
     currentTurn: {
         type: String,
     },
-    draftOrder: [String]
+    draftOrder: [String],
+    draftedGymnasts: [String],
 });
+
+DraftSchema.methods.isCurrentTurn = function(email) {
+    return this.currentTurn == this.parent().getTeamByOwner(email)._id;
+};
+
+DraftSchema.methods.isGymnastDrafted = function(gymnastID) {
+    return this.draftedGymnasts.indexOf(gymnastID) > -1;
+};
 
 module.exports = DraftSchema;

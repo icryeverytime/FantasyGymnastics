@@ -39,7 +39,8 @@ function getGymnastHandler(req, res) {
 // Define '/gymnast' route and use authentication with handler above
 GymnastController.post('/getGymnast', passport.authenticate('jwt', {session: false}), getGymnastHandler);
 
-/** Handle a request to get all gymnasts
+/**
+ * Handle a request to get all gymnasts
  * Returns a list of all gymnasts
  */
 function getAllGymnastsHandler(req, res) {

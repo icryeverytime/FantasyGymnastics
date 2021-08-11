@@ -23,3 +23,15 @@ export interface UserLeftDraftEvent extends DraftEvent {
         userEmail: string
     }
 }
+
+export interface GymnastDraftedEvent extends DraftEvent {
+    type: DraftEventType.GYMNAST_DRAFTED;
+    data: {
+        gymnastID: string
+        name: string,
+    }
+}
+
+export interface DraftCompleteEvent extends DraftEvent {
+    type: DraftEventType.DRAFT_COMPLETE;
+}
