@@ -10,6 +10,11 @@ const config = require('../misc/config');
 // "/draft/<league document id>" workspace (not including <>)
 const draftWorkspaces = io.of(/^\/draft\/\w+$/);
 
+// Return a list of the users in the draft
+draftWorkspaces.getUsersInDraft = function() {
+
+}
+
 draftWorkspaces.on('connection', (socket) => {
     // If this is the email's first socket connection, tell rest of draft room
     if (socket.nsp.emailSockets.get(socket.email).length === 1) {

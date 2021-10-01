@@ -45,19 +45,27 @@ export class DraftComponent implements OnInit, OnDestroy {
   ]);
 
   ngOnInit(): void {
-    this.route.params.subscribe(params => {
-      this.leagueDocumentID = params['leagueDocumentID'];
-      this.connectToWebsocket();
-        this.subscription = this.gymnastService.getAllGymnasts().subscribe(gymnasts => {
-          this.leagueService.getLeague(this.leagueDocumentID).subscribe(league => {
-            this.league = league;
-            
-            this.gymnasts = gymnasts;
-            this.filteredGymnasts = gymnasts;
+    this.leagueDocumentID = this.route.snapshot.params['leagueDocumentID'];
+    this.connectToWebsocket(this.leagueDocumentID);
 
-            this.loading = false;
-          });
-      });
+    // Get the league
+    const promise1 = this.leagueService.getLeague(this.leagueDocumentID).toPromise().then((league: League) => {
+      this.league = league;
+    }).catch(error => {
+      console.log(error)
+    });
+
+    // Get all gymnasts
+    const promise2 = this.gymnastService.getAllGymnasts().toPromise().then(gymnasts => {
+      this.gymnasts = gymnasts;
+      this.filteredGymnasts = this.gymnasts;
+    }).catch(error => {
+      console.log(error)
+    });
+
+    // Once the WebSocket connection is made and the gymnasts and league are loaded, show the apge
+    Promise.all([promise1, promise2]).then(() => {
+      this.loading = false;
     });
   }
 
@@ -66,9 +74,9 @@ export class DraftComponent implements OnInit, OnDestroy {
     this.socket.disconnect();
   }
 
-  connectToWebsocket() {
+  connectToWebsocket(leagueDocumentID: string) {
     let token = this.authenticationService.getToken();
-    this.socket = io('localhost:3000/draft/' + this.leagueDocumentID, {
+    this.socket = io('localhost:3000/draft/' + leagueDocumentID, {
       query: {
         token: token
       }
@@ -101,6 +109,7 @@ export class DraftComponent implements OnInit, OnDestroy {
     });
   }
 
+  /** Functions for sorting and searching gymnast table */
   onChangeEvent(event: any) {
     if(event.target.value == '') {
       this.filteredGymnasts = this.gymnasts;

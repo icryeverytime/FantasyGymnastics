@@ -26,6 +26,44 @@ export class LeagueComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    // let leagueDocumentID = this.route.snapshot.params['leagueDocumentID'];
+
+    // this.authService.isAuthenticated$.subscribe(isAuthenticated => {
+    //   this.isAuthenticated = isAuthenticated;
+
+    //   this.authService.userEmail$.subscribe(userEmail => {
+    //     this.userEmail = userEmail;
+
+    //     // if(this.isAuthenticated) {
+          
+    //   });
+    // });
+    // this.authService.isAuthenticated$.toPromise().then(isAuthenticated => {
+    //   this.isAuthenticated = isAuthenticated;
+    // }).then(() => {
+    //   return this.authService.userEmail$.toPromise();
+    // }).then((userEmail) => {
+    //   // Set the user email from the previous promise
+    //   this.userEmail = userEmail;
+    //   console.log(userEmail);
+    // });
+    // }).then(() => {
+    //   // If we are authenticated, get the league and its teams
+    //   if (this.isAuthenticated) {
+    //     // Get league
+    //     return this.leagueService.getLeague(leagueDocumentID).toPromise();
+    //   }
+    // }).then(league => {
+    //   console.log(league);
+    //   this.league = league;
+    // }).finally(() => {
+    //   this.loading = false
+    //   });
+
+    this.authService.userEmail$.toPromise().then(userEmail => {
+      this.userEmail = userEmail;
+    });
+
     this.route.params.subscribe(params => {
       let leagueDocumentID = params['leagueDocumentID'];
       this.authService.isAuthenticated$.subscribe(isAuthenticated => {
