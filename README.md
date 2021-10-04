@@ -1,4 +1,5 @@
 # FantasyGymnastics
+[![CodeFactor](https://www.codefactor.io/repository/github/chriscosma/fantasygymnastics/badge)](https://www.codefactor.io/repository/github/chriscosma/fantasygymnastics)
 
 Install node: https://nodejs.org/en/ and yarn: https://classic.yarnpkg.com/en/docs/install
 
