@@ -41,8 +41,8 @@ function createLeagueHandler(req, res) {
 
     // If there are no form errors, create a new league if it doesn't already exist
     League.findOne({
-        owner: req.user.email,
-        name: req.body.name
+        owner: {$eq: req.user.email},
+        name: {$eq: req.body.name}
     }).then(foundLeague => {
         if (foundLeague) {
             return res.status(200).json({
@@ -95,7 +95,7 @@ LeagueController.post('/createLeague', passport.authenticate('jwt', {session:fal
  */
 function deleteLeagueHandler(req, res) {
     // Find the league to delete
-    League.findById(req.body.leagueDocumentID).then(league => {
+    League.findById({$eq: req.body.leagueDocumentID}).then(league => {
         // If the request sender is the league owner, delete the league
         if(req.user.email == league.owner) {
             league.remove();
@@ -121,7 +121,7 @@ LeagueController.post('/deleteLeague', passport.authenticate('jwt', {session: fa
 function userLeaguesHandler(req, res) {
     // Find all leagues the authenticated user is in
     League.find({
-        "teams.owner": req.user.email
+        "teams.owner": {$eq: req.user.email}
     }).then(result => {
         // If no leagues are found, return NO_LEAGUES_FOUND message
         if (!result) {
@@ -180,7 +180,7 @@ LeagueController.get('/publicLeagues', passport.authenticate('jwt', {session:fal
  */
 function leagueHandler(req, res) {
     // Find the league
-    League.findById(req.body.leagueDocumentID).then(league => {
+    League.findById({$eq: req.body.leagueDocumentID}).then(league => {
         // If the league does not exist, return NO_LEAGUE_FOUND message
         if (!league) {
             return res.status(200).json({
@@ -212,7 +212,7 @@ LeagueController.post('/league', passport.authenticate('jwt', {session: false}),
  * returns REQUEST_ALREADY_SENT if the user has already requested to join the league
  */
 function requestToJoinLeagueHandler(req, res) {
-    League.findById(req.body.leagueDocumentID).then(league => {
+    League.findById({$eq: req.body.leagueDocumentID}).then(league => {
         // If the league does not exist, return NO_LEAGUE_FOUND message
         if (!league) {
             return res.status(200).json({
@@ -273,7 +273,7 @@ LeagueController.post('/requestToJoin', passport.authenticate('jwt', {session: f
  * returns REQUEST_NOT_FOUND if the requested user has not requested to join the league
  */
 function acceptRequestToJoinLeagueHandler(req, res) {
-    League.findById(req.body.leagueDocumentID).then(league => {
+    League.findById({$eq: req.body.leagueDocumentID}).then(league => {
         // If the league does not exist, return NO_LEAGUE_FOUND message
         if (!league) {
             return res.status(200).json({
@@ -331,7 +331,7 @@ LeagueController.post('/acceptRequestToJoin', passport.authenticate('jwt', {sess
  * returns REQUEST_NOT_FOUND if the requested user has not requested to join the league
  */
 function rejectRequestToJoinLeagueHandler(req, res) {
-    League.findById(req.body.leagueDocumentID).then(league => {
+    League.findById({$eq: req.body.leagueDocumentID}).then(league => {
         // If the league does not exist, return NO_LEAGUE_FOUND message
         if (!league) {
             return res.status(200).json({
@@ -380,7 +380,7 @@ LeagueController.post('/rejectRequestToJoin', passport.authenticate('jwt', {sess
  * returns ALREADY_IN_LEAGUE if the user is already in the league
  */
 function acceptLeagueInvitationHandler(req, res) {
-    League.findById(req.body.leagueDocumentID).then(league => {
+    League.findById({$eq: req.body.leagueDocumentID}).then(league => {
         // If the league does not exist, return NO_LEAGUE_FOUND message
         if (!league) {
             return res.status(200).json({
@@ -437,7 +437,7 @@ LeagueController.post('/acceptLeagueInvitation', passport.authenticate('jwt', {s
  * returns ALREADY_IN_LEAGUE if the invited user is already in the league
  */
 function inviteToLeagueHandler(req, res) {
-    League.findById(req.body.leagueDocumentID).then(league => {
+    League.findById({$eq: req.body.leagueDocumentID}).then(league => {
         // If the league does not exist, return NO_LEAGUE_FOUND message
         if (!league) {
             return res.status(200).json({

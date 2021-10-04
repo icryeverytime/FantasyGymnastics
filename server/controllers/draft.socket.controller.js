@@ -61,7 +61,7 @@ draftWorkspaces.use((socket, next) => {
 draftWorkspaces.use((socket, next) => {
     socket.nsp.leagueDocumentID = socket.nsp.name.split('/')[2].trim();
 
-    League.findOne({_id: socket.nsp.leagueDocumentID }).then((league) => {
+    League.findOne({_id: {$eq: socket.nsp.leagueDocumentID }}).then((league) => {
         if (!league) {
             console.log('League not found');
             next(new Error('League not found'));

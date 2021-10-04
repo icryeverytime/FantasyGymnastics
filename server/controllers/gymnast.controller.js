@@ -19,7 +19,7 @@ const GymnastController = express.Router();
  * returns GYMNAST_NOT_FOUND if gymnast with document ID does not exist
  */
 function getGymnastHandler(req, res) {
-    Gymnast.findOne({'_id': req.body.gymnastDocumentID}).then(gymnast => {
+    Gymnast.findOne({'_id': {$eq: req.body.gymnastDocumentID}}).then(gymnast => {
         // If the gymnast does not exist send GYMNAST_NOT_FOUND message
         if(!gymnast) {
             res.status(200).json({

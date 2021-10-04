@@ -35,7 +35,7 @@ function registerHandler(req, res) {
         });
     }
 
-    User.findOne({email: req.body.email}).then(user => {
+    User.findOne({email: {$eq: req.body.email}}).then(user => {
         // If the user already exists, return USER_EXISTS_ALREADY message
         if (user) {
             return res.status(200).json({

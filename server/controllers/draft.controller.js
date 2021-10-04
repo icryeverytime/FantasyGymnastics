@@ -23,7 +23,7 @@ const DraftController = express.Router();
  * returns DRAFT_ALREADY_STARTED if draft has already started
  */
 function startDraftHandler(req, res) {
-    League.findOne({ _id: req.body.leagueDocumentID }).then(league => {
+    League.findOne({ _id: {$eq: req.body.leagueDocumentID }}).then(league => {
         if(!league) {
             return res.status(200).json({
                 message: constants.NO_LEAGUE_FOUND
@@ -56,7 +56,7 @@ function startDraftHandler(req, res) {
 DraftController.post('/startDraft/', passport.authenticate('jwt', {session: false}), startDraftHandler);
 
 function draftGymnastHandler(req, res) {
-    League.findOne({ _id: req.body.leagueDocumentID }).then(league => {
+    League.findOne({ _id: {$eq: req.body.leagueDocumentID }}).then(league => {
         if(!league) {
             return res.status(200).json({
                 message: constants.NO_LEAGUE_FOUND
@@ -100,7 +100,7 @@ function draftGymnastHandler(req, res) {
         }
 
         let draftComplete = league.draftGymnast(league.getTeamByOwner(req.user.email), req.body.gymnastDocumentID);
-        Gymnast.findOne({ _id: req.body.gymnastDocumentID }).then(gymnast => {
+        Gymnast.findOne({ _id: {$eq: req.body.gymnastDocumentID }}).then(gymnast => {
             draftWorkspaces.emit('draftEvent', {
                 type: 2, // GYMNAST_DRAFTED event
                 data: {
