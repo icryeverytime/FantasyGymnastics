@@ -2,8 +2,7 @@ FROM node:14
 
 WORKDIR /usr/src/app
 COPY package*.json ./
-RUN yarn install
-RUN yarn cache clean
+RUN yarn install && yarn cache clean
 
 COPY . .
 EXPOSE 3000
