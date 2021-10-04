@@ -86,7 +86,7 @@ function loginHandler(req, res) {
         });
     }
 
-    User.findOne({email: req.body.email}).then(user => {
+    User.findOne({email: {$eq: req.body.email}}).then(user => {
         if(user && user.email) {
             user.isValidPassword(req.body.password).then(validate => {
                 // If password is not valid return WRONG_PASSWORD message
